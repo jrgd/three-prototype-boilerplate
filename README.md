@@ -22,3 +22,4 @@ Webpack configured to resolve 'three' from ./node_modules
          |- index.js
          |- index.scss
       
+![Screenshot](./extras/threejs-prototype-boilerplate.png)
