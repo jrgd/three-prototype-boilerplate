@@ -1,0 +1,47 @@
+body {
+  background-color: #F0B;
+
+  canvas { 
+    display: block;
+  }
+  #container {
+      width: 100vw;
+      height: 100vh;
+      border: 0px solid black;
+      margin: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 10;
+  }
+}
+
+div#interface {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 200;
+  transition: right 0.35s;
+
+  &.hidden {
+    right: -157px;
+  }
+
+  a {
+    background-color: white;
+    font-family: Courier;
+    padding: 4px 4px 4px 10px;
+    display: block;
+    margin: 2px;
+    font-size: 12px;
+
+    &:hover {
+        background-color: black;
+        color: white;
+    }
+
+    span.hidden {
+        display:none;
+    }
+  }
+}
