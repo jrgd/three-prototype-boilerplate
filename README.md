@@ -10,14 +10,15 @@ Components
 
 Webpack configured to resolve 'three' from ./node_modules
 
-|- dist
-|
-|- src
-   |- assets
-   |  |- fonts
-   |  |- images
-   |  |- models
-   |
-   |- index.html
-   |- index.js
-   |- index.scss
+      |- dist
+      |
+      |- src
+         |- assets
+         |  |- fonts
+         |  |- images
+         |  |- models
+         |
+         |- index.html
+         |- index.js
+         |- index.scss
+      
