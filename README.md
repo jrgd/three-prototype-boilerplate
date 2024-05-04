@@ -5,8 +5,10 @@ Components
 - Webpack
 - PostCSS 
 
-```yarn dev``` - injects scss compiled into the page; reloads the page on file change (js, html)
-```yarn build``` - will copy assets from ./src to ./dist
+```yarn dev``` injects scss compiled into the page; reloads the page on file change (js, html)
+
+```yarn build``` will copy assets from ./src to ./dist
+
 
 Webpack configured to resolve 'three' from ./node_modules
 
