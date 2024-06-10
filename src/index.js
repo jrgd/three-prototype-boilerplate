@@ -15,6 +15,13 @@ let loader;
 let controls;
 var mouse, raycaster;
 
+const url = new URL(document.currentScript.src);
+console.log(url);
+var special_path = url.pathname.substring(0, url.pathname.lastIndexOf('/'));
+if (special_path == "") {
+    special_path = url.origin;
+}
+console.log('# special_path: ', special_path);
 
 // Interactions: Define the event handlers
 // Function to set up mouse interaction
@@ -74,22 +81,6 @@ function model_click() {
   animate(); //render();
 }
 
-function handleInterfaceMenu(event){
-    console.log("we move the mouse")
-    var interface_ele = document.getElementById('interface');
-    if (event.clientX > window.innerWidth-interface_ele.clientWidth-10 && event.clientX < window.innerWidth) {
-        console.log("we reached the corner")
-        if (event.clientY > 0 && event.clientY < interface_ele.clientHeight+10) {
-            interface_ele.classList.remove('hidden');
-        } else {
-            interface_ele.classList.add('hidden');
-        }
-    } else {
-        interface_ele.classList.add('hidden');
-    }
-}
-document.addEventListener('mousemove', handleInterfaceMenu)
-
 
 function animate() {
     requestAnimationFrame( animate );
@@ -98,6 +89,7 @@ function animate() {
 
 // Function to initialize Three.js scene
 function init() {
+
 
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
@@ -111,7 +103,6 @@ function init() {
     renderer = new THREE.WebGLRenderer({alpha: true});
     renderer.setSize( window.innerWidth, window.innerHeight );
 
-    // camera.position.z = 5;
     camera.position.set(20,15,10);
     camera.lookAt(new THREE.Vector3(-5,15,15))
 
@@ -121,23 +112,34 @@ function init() {
 
     scene.add( light );
 
-
-    const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    const cube = new THREE.Mesh( geometry, material );
-    scene.add( cube );
+    var projectModelUrl = special_path + '/mastaba-doubled.glb';
+    console.log(projectModelUrl);
+    loader = new GLTFLoader();
+    loader.load(
+            projectModelUrl, // Path to your model file
+            function ( gltf ) {
+                console.log('_ loaded');
+                // Retrieve the mesh from the loaded model
+                var model = gltf.scene;
+                model.name += '_' + Date.now();
+                scene.add(model);
+            },
+            // onProgress callback function (optional)
+            function ( xhr ) {
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+            },
+            // onError callback function (optional)
+            function ( error ) {
+                console.error( 'An error happened', error );
+            }
+        );
 
 
     var container = document.getElementById("container");
     container.appendChild( renderer.domElement );
-
-    console.log('WOWSER');
-
     controls = new OrbitControls( camera, renderer.domElement );
-
     animate();
 }
-
 
 // Call init function when the page loads
 window.onload = init;

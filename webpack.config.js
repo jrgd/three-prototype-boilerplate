@@ -46,13 +46,15 @@ module.exports = {
           patterns: [
             {
               from: "src/assets/",
-              to: "assets/",
+              to: "./",
             },
           ],
         }),
     ],
     devServer: {
-        static: './dist',
+        static: {
+            directory: path.resolve(__dirname, '.'),
+        },
         hot: true,
     },
 };
