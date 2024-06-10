@@ -138,6 +138,8 @@ function init() {
     var container = document.getElementById("container");
     container.appendChild( renderer.domElement );
     controls = new OrbitControls( camera, renderer.domElement );
+    controls.enableZoom = false;
+    
     animate();
 }
 
