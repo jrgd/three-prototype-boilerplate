@@ -1,96 +1,23 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-
 import "./index.scss";
-
-console.log(THREE.REVISION);
-console.log(THREE.KeyframeTrack);
-
-const clock = new THREE.Clock();
 
 // Initialize variables
 let scene, camera, renderer;
+let currentModel = null;
+
+
+let insert_at_x_position = 0, insert_at_y_position = 0, insert_at_z_position = 0;
 let loader;
+
 let controls;
-var mouse, raycaster;
 
-
-// Interactions: Define the event handlers
-// Function to set up mouse interaction
-function setupMouseInteraction(model) {
-    console.log(model);
-    // Create a raycaster
-    var raycaster = new THREE.Raycaster();
-    var mouse = new THREE.Vector2();
-
-    // Define the event handler for mouse move
-    function model_mouseMove(event) {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        raycaster.setFromCamera(mouse, camera);
-
-        // Calculate objects intersecting the picking ray
-        var intersects = raycaster.intersectObjects(scene.children, true);
-
-        // console.log(intersects[0].object);
-        // console.log(model);
-
-        // Check if the model is intersected by the ray
-        if (intersects.length > 0){ // && intersects[0].object === model) {
-            var intersected = intersects[0].object;
-            if (intersected instanceof THREE.Group) {
-                // If intersected object is a group, handle its children
-                intersected.traverse(function(child) {
-                    if (child instanceof THREE.Mesh) {
-                        // Perform actions on the intersected child
-                        setOpacity(child, 0.5); // Example: Set opacity to 50%
-                    }
-                });
-            } else if (intersected instanceof THREE.Mesh) {
-                // If intersected object is a mesh, perform actions directly
-                setOpacity(intersected, 0.5); // Example: Set opacity to 50%
-            }
-        } else {
-            console.log("Mouse left object");
-            setOpacity(model, 1)
-        }
-    }
-
-    // Attach mouse move event listener
-    document.addEventListener('mousemove', model_mouseMove, false);
-    document.addEventListener('click', model_click, false);
-}
-function model_click() {
-  event.preventDefault();
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  raycaster.setFromCamera(mouse, camera);
-  var intersects = raycaster.intersectObject(scene, true);
-  if (intersects.length > 0) {
-        var object = intersects[0].object;
-    object.material.color.set( Math.random() * 0xffffff );
-  }
-  animate(); //render();
-}
-
-function handleInterfaceMenu(event){
-    console.log("we move the mouse")
-    var interface_ele = document.getElementById('interface');
-    if (event.clientX > window.innerWidth-interface_ele.clientWidth-10 && event.clientX < window.innerWidth) {
-        console.log("we reached the corner")
-        if (event.clientY > 0 && event.clientY < interface_ele.clientHeight+10) {
-            interface_ele.classList.remove('hidden');
-        } else {
-            interface_ele.classList.add('hidden');
-        }
-    } else {
-        interface_ele.classList.add('hidden');
-    }
-}
-document.addEventListener('mousemove', handleInterfaceMenu)
-
-
+const jrgd_material = new THREE.MeshPhongMaterial( {
+                    color: 0xFFFFFF,
+                    shininess: 100,
+                    specular: 0x111111,
+                    // side: THREE.BackSide
+                } );
 function animate() {
     requestAnimationFrame( animate );
     renderer.render( scene, camera );
@@ -98,34 +25,21 @@ function animate() {
 
 // Function to initialize Three.js scene
 function init() {
-
-    raycaster = new THREE.Raycaster();
-    mouse = new THREE.Vector2();
-
     // Initialize scene, camera, and renderer
     // Add lights, controls, etc.
 
     // via https://threejs.org/docs/index.html#manual/en/introduction/Creating-a-scene
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
     renderer = new THREE.WebGLRenderer({alpha: true});
     renderer.setSize( window.innerWidth, window.innerHeight );
-
-    // camera.position.z = 5;
-    camera.position.set(20,15,10);
-    camera.lookAt(new THREE.Vector3(-5,15,15))
+    camera.position.z = 5;
 
     const light = new THREE.PointLight( 0xFFFFFF, 220, 20 );
     light.position.set( 5, 5, 5 );
     light.shadow.bias = - 0.005; // reduces self-shadowing on double-sided objects
 
     scene.add( light );
-
-
-    const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    const cube = new THREE.Mesh( geometry, material );
-    scene.add( cube );
 
 
     var container = document.getElementById("container");
@@ -138,6 +52,146 @@ function init() {
     animate();
 }
 
+// Function to load 3D model
+function loadModel(modelPath) {
+    // Load 3D model and add it to the scene
+}
 
+// Function to switch projects
+function switchProject(project) {
+    // Remove current model from the scene
+    // Load and add new model based on selected project
+    var geometry,cube, material;
+
+    insert_at_x_position++;
+    if (insert_at_x_position > 5) {
+        insert_at_x_position = 1;
+        insert_at_y_position--;
+    }
+
+    if (insert_at_y_position < -5) {
+        insert_at_x_position = 1;
+        insert_at_y_position = 1;
+        insert_at_z_position--;
+    }
+
+
+    switch(true) {
+        case project == 'project1':
+            geometry = new THREE.BoxGeometry( 0.8, 0.8, 0.8 );
+            material = new THREE.MeshBasicMaterial( { color: 0xFFFF00 } );
+            cube = new THREE.Mesh( geometry, material );
+            cube.position.x = insert_at_x_position;
+            cube.position.y = insert_at_y_position;
+            cube.position.z = insert_at_z_position;
+            scene.add( cube );
+            controls.target.set(insert_at_x_position,0,-5).applyQuaternion(camera.quaternion).add(camera.position)
+            console.log('_ inserted')
+            break;
+        case project == 'project2':
+            geometry = new THREE.BoxGeometry( 0.8, 0.8, 0.8 );
+            material = new THREE.MeshBasicMaterial( { color: 0xff1d8e } );
+            cube = new THREE.Mesh( geometry, material );
+            cube.position.x = insert_at_x_position;
+            cube.position.y = insert_at_y_position;
+            cube.position.z = insert_at_z_position;
+            scene.add( cube );
+            controls.target.set(insert_at_x_position,0,-5).applyQuaternion(camera.quaternion).add(camera.position)
+            console.log('_ inserted')
+            break;
+        case project == 'project3':
+            geometry = new THREE.BoxGeometry( 0.8, 0.8, 0.8 );
+            material = new THREE.MeshBasicMaterial( { color: 0x94812B } );
+            cube = new THREE.Mesh( geometry, material );
+            cube.position.x = insert_at_x_position;
+            cube.position.y = insert_at_y_position;
+            cube.position.z = insert_at_z_position;
+            scene.add( cube );
+            controls.target.set(insert_at_x_position,0,-5).applyQuaternion(camera.quaternion).add(camera.position)
+            console.log('_ inserted')
+            break;
+        case project == 'project4':
+            geometry = new THREE.BoxGeometry( 0.8, 0.8, 0.8 );
+                        material = new THREE.MeshBasicMaterial( { color: 0x000080 } );
+                        cube = new THREE.Mesh( geometry, material );
+                        cube.position.x = insert_at_x_position;
+                        cube.position.y = insert_at_y_position;
+                        cube.position.z = insert_at_z_position;
+                        scene.add( cube );
+                        controls.target.set(insert_at_x_position,0,-5).applyQuaternion(camera.quaternion).add(camera.position)
+                        console.log('_ inserted')
+                        break;
+        case project == 'project5':
+            geometry = new THREE.BoxGeometry( 0.8, 0.8, 0.8 );
+                        material = new THREE.MeshBasicMaterial( { color: 0x444444 } );
+                        cube = new THREE.Mesh( geometry, material );
+                        cube.position.x = insert_at_x_position;
+                        cube.position.y = insert_at_y_position;
+                        cube.position.z = insert_at_z_position;
+                        scene.add( cube );
+                        controls.target.set(insert_at_x_position,0,-5).applyQuaternion(camera.quaternion).add(camera.position)
+                        console.log('_ inserted')
+                        break;
+        case project == 'project6':
+            geometry = new THREE.BoxGeometry( 0.8, 0.8, 0.8 );
+            material = new THREE.MeshBasicMaterial( { color: 0xAAAAAA } );
+            cube = new THREE.Mesh( geometry, material );
+            cube.position.x = insert_at_x_position;
+            cube.position.y = insert_at_y_position;
+            cube.position.z = insert_at_z_position;
+            scene.add( cube );
+            controls.target.set(insert_at_x_position,0,-5).applyQuaternion(camera.quaternion).add(camera.position)
+            console.log('_ inserted')
+            break;
+            // // TypeError: undefined is not a constructor (evaluating 'new THREE.GLTFLoader()')
+            // loader = new GLTFLoader();
+            // loader.load(
+            //         'assets/models/stool.gltf', // Path to your model file
+            //         function ( gltf ) {
+            //             // Retrieve the mesh from the loaded model
+            //             var model = gltf.scene;
+            //             model.position.set(insert_at_x_position, 0, 0); // Adjust position as needed
+            //             model.scale.set(0.025, 0.025, 0.025);
+            //             scene.add(model);
+            //             console.log('_ inserted');
+            //         },
+            //         // onProgress callback function (optional)
+            //         function ( xhr ) {
+            //             console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+            //         },
+            //         // onError callback function (optional)
+            //         function ( error ) {
+            //             console.error( 'An error happened', error );
+            //         }
+            //     );
+            // console.log('_ loading')
+            // break;
+
+    }
+
+
+    controls.enabled = false;           //disable orbitControls
+    // controls.reset();
+    const vect3 = new THREE.Vector3(insert_at_x_position/2,insert_at_y_position/2,insert_at_z_position/2); //define any vector (here we just point at 0,0,0)
+    controls.target = vect3;            //update orbitControls target
+    camera.lookAt(vect3);               
+    camera.lookAt(vect3);               //optional pre-rotation (in case orbit is not updated in render loop)
+    controls.enabled = true;    
+}
+
+// Function to handle project switching events
+function handleProjectSwitch(event) {
+    const projectId = event.target.id;
+    console.log(projectId);
+    switchProject(projectId);
+}
+
+// Event listeners for project switch buttons
+document.getElementById("project1").addEventListener("click", handleProjectSwitch);
+document.getElementById("project2").addEventListener("click", handleProjectSwitch);
+document.getElementById("project3").addEventListener("click", handleProjectSwitch);
+document.getElementById("project4").addEventListener("click", handleProjectSwitch);
+document.getElementById("project5").addEventListener("click", handleProjectSwitch);
+document.getElementById("project6").addEventListener("click", handleProjectSwitch);
 // Call init function when the page loads
 window.onload = init;
