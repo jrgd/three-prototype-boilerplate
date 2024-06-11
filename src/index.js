@@ -43,6 +43,11 @@ function init() {
 
 
     var container = document.getElementById("container");
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'container';
+        document.body.appendChild(container);
+    }
     container.appendChild( renderer.domElement );
 
     console.log('WOWSER');
