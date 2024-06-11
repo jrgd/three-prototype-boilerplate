@@ -51,7 +51,7 @@ function init() {
     console.log('WOWSER');
 
     controls = new OrbitControls( camera, renderer.domElement );
-
+    controls.enableZoom = false; // prevent zoom with the scroll (Explore website needs to have scroll for content)
     animate();
 }
 
