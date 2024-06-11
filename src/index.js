@@ -4,8 +4,6 @@ import "./index.scss";
 
 // Initialize variables
 let scene, camera, renderer;
-let currentModel = null;
-
 
 let insert_at_x_position = 0, insert_at_y_position = 0, insert_at_z_position = 0;
 let loader;
